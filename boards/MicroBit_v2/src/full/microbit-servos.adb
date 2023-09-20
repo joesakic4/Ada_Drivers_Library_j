@@ -45,9 +45,9 @@ package body MicroBit.Servos is
    procedure Stop (Pin : Servo_Pin_Id) is
    begin
       if Supports (Pin, Digital) then
-         Set (Pin, False);
+         digitalWrite (Pin, False);
       else
-         Write (Pin, 0);
+         analogWrite (Pin, 0);
       end if;
    end Stop;
 
@@ -64,7 +64,7 @@ package body MicroBit.Servos is
          Analog_Period_Set := True;
       end if;
 
-      Write (Pin, To_PWM (Setpoint));
+      analogWrite (Pin, To_PWM (Setpoint));
    end Go;
 
 end MicroBit.Servos;

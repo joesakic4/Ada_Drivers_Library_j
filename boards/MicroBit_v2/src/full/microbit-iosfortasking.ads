@@ -19,10 +19,10 @@ package MicroBit.IOsForTasking is
                              when 0 | 1 | 2 | 26 => True,
                              when others    => False));
 
-   procedure Set (Pin : Pin_Id; Value : Boolean)
+   procedure digitalWrite (Pin : Pin_Id; Value : Boolean)
      with Pre => Supports (Pin, Digital);
 
-   function Set (Pin : Pin_Id) return Boolean
+   function digitalRead (Pin : Pin_Id) return Boolean
      with Pre => Supports (Pin, Digital);
 
    type Analog_Value is range 0 .. 1023; --since we use 10 bit resolution. But if we use 12 bit, we need to update to 4095
@@ -31,9 +31,9 @@ package MicroBit.IOsForTasking is
    --  Set the period (in microseconds) of the PWM signal for all analog output
    --  pins.
 
-   procedure Write (Pin : Pin_Id; Value : Analog_Value);
+   procedure analogWrite (Pin : Pin_Id; Value : Analog_Value);
 
-   function Analog (Pin : Pin_Id) return Analog_Value
+   function analogRead (Pin : Pin_Id) return Analog_Value
      with Pre => Supports (Pin, Analog);
    --  Read the voltagle applied to the pin. 0 means 0V 1023 means 3.3V
 

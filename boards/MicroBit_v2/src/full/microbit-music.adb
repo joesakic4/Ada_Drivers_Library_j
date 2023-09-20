@@ -40,7 +40,7 @@ package body MicroBit.Music is
       end if;
 
       if IsPlaying then
-         Write (27, Volume); --adjust volume of currently played tone
+         analogWrite (27, Volume); --adjust volume of currently played tone
       end if;
    end VolumeUp;
 
@@ -51,7 +51,7 @@ package body MicroBit.Music is
       end if;
 
       if IsPlaying then
-         Write (27, Volume);
+         analogWrite (27, Volume);
       end if;
    end VolumeDown;
 
@@ -83,11 +83,11 @@ package body MicroBit.Music is
       if P = Rest then
          IsPlaying := False;
          --  Disable PWM on the pin by giving it a digital value
-         Set (Pin, False);
+         digitalWrite (Pin, False);
       else
          IsPlaying := True;
          --  Enable PWM with a 50% duty cycle
-         Write (Pin, Volume); --512 =50%, but https://github.com/bbcmicrobit/micropython/blob/master/source/microbit/modmusic.cpp use 128?
+         analogWrite (Pin, Volume); --512 =50%, but https://github.com/bbcmicrobit/micropython/blob/master/source/microbit/modmusic.cpp use 128?
 
          --  Set the period corresponding to the required pitch
          Set_Analog_Period_Us (1_000_000 / Natural (P));
@@ -115,7 +115,7 @@ package body MicroBit.Music is
          Play (Pin, N);
       end loop;
 
-      Set (Pin, False); --stop
+      digitalWrite (Pin, False); --stop
    end Play;
 
 begin

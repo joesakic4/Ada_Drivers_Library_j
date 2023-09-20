@@ -38,7 +38,7 @@ procedure Main is
 begin
   loop
      --  Read analog value of microbit pin 1
-     Value := Analog (1);
+     Value := analogRead (1);
 
      -- Put read value onto serial monitor
      Put_Line(Value'Image);

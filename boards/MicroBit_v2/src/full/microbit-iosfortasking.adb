@@ -263,7 +263,7 @@ package body MicroBit.IOsForTasking is
    -- Set --
    ---------
 
-   procedure Set
+   procedure digitalWrite
      (Pin : Pin_Id;
       Value : Boolean)
    is
@@ -289,13 +289,13 @@ package body MicroBit.IOsForTasking is
       else
          Pt.Clear;
       end if;
-   end Set;
+   end digitalWrite;
 
    ---------
    -- Set --
    ---------
 
-   function Set
+   function digitalRead
      (Pin : Pin_Id)
       return Boolean
    is
@@ -318,7 +318,7 @@ package body MicroBit.IOsForTasking is
       end if;
 
       return Pt.Set;
-   end Set;
+   end digitalRead;
 
    --------------------------
    -- Set_Analog_Period_Us --
@@ -338,7 +338,7 @@ package body MicroBit.IOsForTasking is
    -- Write --
    -----------
 
-   procedure Write
+   procedure analogWrite
      (Pin : Pin_Id;
       Value : Analog_Value)
    is
@@ -384,13 +384,13 @@ if Value = 0 then
          PWMs (PWM_Alloc (Pin)).Cmp := To_Compare_Value (Value);
       end if;
 	  
-   end Write;
+   end analogWrite;
 
    ------------
    -- Analog --
    ------------
 
-   function Analog
+   function analogRead
      (Pin : Pin_Id)
       return Analog_Value
    is
@@ -419,7 +419,7 @@ if Value = 0 then
                             Ref   => VDD_One_Forth, --VDD_One_Forth
                             Res   => Res_10bit);
       return Analog_Value (Result);
-   end Analog;
+   end analogRead;
 
    procedure Setup_Pins is
    begin

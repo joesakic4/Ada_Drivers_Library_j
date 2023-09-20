@@ -29,7 +29,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 with Microbit.Console; use Microbit.Console;
-with Microbit.Time; use Microbit.Time;
+--with Microbit.Time; use Microbit.Time;
 use Microbit;
 package body DFR0548 is
 
@@ -90,7 +90,7 @@ package body DFR0548 is
                                           1 =>  START),
                                  Status => Status);
 
-      Delay_Ms(1); -- needed for the OSC to wake up (max 500us)
+      delay(0.1); -- needed for the OSC to wake up (max 500us)
 
 
 
