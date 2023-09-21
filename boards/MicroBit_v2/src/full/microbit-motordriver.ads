@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                       Copyright (C) 2018, AdaCore                        --
+--                    Copyright (C) 2018-2019, AdaCore                      --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -28,28 +28,40 @@
 --   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   --
 --                                                                          --
 ------------------------------------------------------------------------------
-with MicroBit.Console; use MicroBit.Console;
-with MicroBit.IOsForTasking; use MicroBit.IOsForTasking;
+with DFR0548; use DFR0548;
+with HAL;     use HAL;
 
-procedure Main is
-   pin1 : constant Pin_Id := 1;
-   pinIsActive : Boolean := False;
+package MicroBit.MotorDriver is
 
-begin
-     digitalWrite (pin1, True);
+   type Directions is (Forward,
+                       Left,
+                       Right,
+                       Forward_Left,
+                       Backward_Left,
+                       Turning,
+                       Lateral_Left,
+                       Rotating_Left,
+                       Stop);
 
-   loop
-      -- Toggle between True and False, making pin1 high and low
-      pinIsActive := not pinIsActive;
+   type Speeds is record
+      rf: UInt12;
+      rb: UInt12;
+      lf: UInt12;
+      lb: UInt12;
+   end record;
 
-      --Write to pin1
-      digitalWrite (pin1, pinIsActive);
+   procedure Drive (Direction : Directions;
+                    Speed : Speeds := (4095,4095,4095,4095));
 
-      --Show on serial port
-      Put_Line("Pin1 is: " & pinIsActive'Image);
+   procedure Servo (ServoPin : ServoPins ;
+                    Angle : Degrees);
 
-      --  Wait 500 milliseconds
-      delay(0.5);
+private
+   procedure Drive_Wheels(rf : Wheel;
+                         rb : Wheel;
+                         lf : Wheel;
+                         lb : Wheel);
 
-   end loop;
-end Main;
+   procedure Initialize;
+
+end MicroBit.MotorDriver;

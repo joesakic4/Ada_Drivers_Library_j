@@ -88,9 +88,9 @@ package body MicroBit.MotorDriver is
                          lf => (0,Speed.lf),
                          rb => (0,0));
          when Rotating_Left =>
-            Drive_Wheels(rf => (0,Speed.rf),
+            Drive_Wheels(rf => (Speed.rf,0),
                          lb => (Speed.rb, 0),
-                         lf => (Speed.lf, 0),
+                         lf => (0,Speed.lf),
                          rb => (0,Speed.lb));
          when Stop =>
             Drive_Wheels(rf => (0, 0),
