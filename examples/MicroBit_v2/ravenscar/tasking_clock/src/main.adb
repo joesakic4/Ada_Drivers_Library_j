@@ -1,7 +1,8 @@
 with Delay_Aux_Pkg; -- this clock package is using Ada.Real_Time so its limit is 30us resolution.
-with Ada.Text_IO; use Ada.Text_IO;
+with MicroBit.Console; use MicroBit.Console;
 with Ada.Real_Time; use Ada.Real_Time;
 
+use MicroBit;
 
 --This example shows what happens when the execution time overshoots the period
 

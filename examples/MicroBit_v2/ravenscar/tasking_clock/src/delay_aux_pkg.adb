@@ -1,4 +1,5 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with MicroBit.Console; use MicroBit.Console;
+use MicroBit;
 
 package body Delay_Aux_Pkg is
 

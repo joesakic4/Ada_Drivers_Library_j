@@ -29,7 +29,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 with Microbit.Console; use Microbit.Console;
-with Microbit.Time; use Microbit.Time;
 use Microbit;
 package body DFR0548 is
 
@@ -90,7 +89,6 @@ package body DFR0548 is
                                           1 =>  START),
                                  Status => Status);
 
-      Delay_Ms(1); -- needed for the OSC to wake up (max 500us)
 
 
 
@@ -131,12 +129,11 @@ package body DFR0548 is
        PWM_Off := (Duty_Cycle * 4096.0) / 20000.0; --between range 123 - 492
        Rounded_PWM_Off := UInt16(Float'Rounding(PWM_Off));
 
-      Buffer (0) := UInt8(UInt8(LED15_ON_L) - ((UInt8(ServoPin-1)) * 4)); --register start address
+       Buffer (0) := UInt8(UInt8(LED15_ON_L) - ((UInt8(ServoPin-1)) * 4)); --register start address
        Buffer (1) := 0;
        Buffer (2) := 0;
        Buffer (3) := UInt8(Rounded_PWM_Off and 16#FF#); -- FORWARD OFF L
        Buffer (4) := UInt8(Shift_Right (Rounded_PWM_Off, 8)); -- FORWARD OFF H
-       Put_Line(Buffer(4)'Image);
 
 
        This.Port.Mem_Write_Buffer(Addr => MOTORDRIVER_ADDRESS,

@@ -35,7 +35,6 @@ with MicroBit.DisplayRT;
 with MicroBit.DisplayRT.Symbols;
 with MicroBit.Accelerometer;
 with MicroBit.Console; use MicroBit.Console;
---with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Real_Time; use Ada.Real_Time;
 use MicroBit;
 
