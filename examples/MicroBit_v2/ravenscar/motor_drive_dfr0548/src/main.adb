@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                    Copyright (C) 2018-2020, AdaCore                      --
+--                       Copyright (C) 2019, AdaCore                        --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -29,69 +29,45 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with nRF.Device;
-with nRF.TWI;
+with MicroBit.MotorDriver; use MicroBit.MotorDriver; --using the procedures defined here
+with DFR0548;  -- using the types defined here
 
-package body MicroBit.I2C is
+with MicroBit.Console; use MicroBit.Console; -- for serial port communication
+use MicroBit; --for pin names
 
-   Init_Done : Boolean := False;
-   Init_DoneExt : Boolean := False;
+procedure Main is
 
-   Device : nRF.TWI.TWI_Master renames nRF.Device.TWI_0;
-   --  This device should not conflict with the device used in MicroBit.SPI.
-   --  See nRF Series Reference Manual, chapter Memory.Instantiation.
+begin
+   MotorDriver.Servo(1,90);
+   delay 1.0; -- equivalent of Time.Sleep(1000) = 1 second
 
-   --use this interface for external I2C
-   DeviceExt : nRF.TWI.TWI_Master renames nRF.Device.TWI_1;
-   -----------------
-   -- Initialized --
-   -----------------
+   loop
+      -- DEMONSTRATION ROUTINE 4 MOTORS (useful for checking your wiring)
+      MotorDriver.Drive(Forward,(4095,0,0,0)); --right front wheel to M4
+      delay 1.0;
+      MotorDriver.Drive(Forward,(0,4095,0,0)); --right back wheel to M3
+      delay 1.0;
+      MotorDriver.Drive(Forward,(0,0,4095,0)); --left front wheel to M2
+      delay 1.0;
+      MotorDriver.Drive(Forward,(0,0,0,4095)); --left back wheel to M1
+      delay 1.0;
+      MotorDriver.Drive(Stop);
 
-   function Initialized return Boolean
-   is (Init_Done);
+      -- DEMONSTRATION ROUTINE SERVO
+      for I in reverse DFR0548.Degrees range 0..90 loop
+         MotorDriver.Servo(1,I);
+          delay 0.02; --20 ms
+      end loop;
 
-   function InitializedExt return Boolean
-   is (Init_DoneExt);
-   ----------------
-   -- Initialize --
-   ----------------
+      for I in DFR0548.Degrees range 90..180 loop
+         MotorDriver.Servo(1,I);
+         delay 0.02; --20 ms
+      end loop;
 
-   procedure Initialize (S : Speed := S400kbps) is
-   begin
-      Device.Configure
-        (SCL   => MB_SCL.Pin,
-         SDA   => MB_SDA.Pin,
-         Speed => (case S is
-                      when S100kbps => nRF.TWI.TWI_100kbps,
-                      when S250kbps => nRF.TWI.TWI_250kbps,
-                      when S400kbps => nRF.TWI.TWI_400kbps)
-        );
+      for I in reverse DFR0548.Degrees range 90..180 loop
+         MotorDriver.Servo(1,I);
+          delay 0.02; --20 ms
+      end loop;
 
-      Device.Enable;
-      Init_Done := True;
-   end Initialize;
-
-   procedure InitializeExt (S : Speed := S400kbps) is
-   begin
-      DeviceExt.Configure
-        (SCL   => MB_SCL_EXT.Pin,
-         SDA   => MB_SDA_EXT.Pin,
-         Speed => (case S is
-                      when S100kbps => nRF.TWI.TWI_100kbps,
-                      when S250kbps => nRF.TWI.TWI_250kbps,
-                      when S400kbps => nRF.TWI.TWI_400kbps)
-        );
-
-      DeviceExt.Enable;
-      Init_DoneExt := True;
-   end InitializeExt;
-   ----------------
-   -- Controller --
-   ----------------
-
-   function Controller return not null Any_I2C_Port
-   is (Device'Access);
-
-   function ControllerExt return not null Any_I2C_Port
-   is (DeviceExt'Access);
-end MicroBit.I2C;
+   end loop;
+end Main;

@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                    Copyright (C) 2018-2020, AdaCore                      --
+--                    Copyright (C) 2018-2019, AdaCore                      --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -28,70 +28,40 @@
 --   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   --
 --                                                                          --
 ------------------------------------------------------------------------------
+with DFR0548; use DFR0548;
+with HAL;     use HAL;
 
-with nRF.Device;
-with nRF.TWI;
+package MicroBit.MotorDriver is
 
-package body MicroBit.I2C is
+   type Directions is (Forward,
+                       Left,
+                       Right,
+                       Forward_Left,
+                       Backward_Left,
+                       Turning,
+                       Lateral_Left,
+                       Rotating_Left,
+                       Stop);
 
-   Init_Done : Boolean := False;
-   Init_DoneExt : Boolean := False;
+   type Speeds is record
+      rf: UInt12;
+      rb: UInt12;
+      lf: UInt12;
+      lb: UInt12;
+   end record;
 
-   Device : nRF.TWI.TWI_Master renames nRF.Device.TWI_0;
-   --  This device should not conflict with the device used in MicroBit.SPI.
-   --  See nRF Series Reference Manual, chapter Memory.Instantiation.
+   procedure Drive (Direction : Directions;
+                    Speed : Speeds := (4095,4095,4095,4095));
 
-   --use this interface for external I2C
-   DeviceExt : nRF.TWI.TWI_Master renames nRF.Device.TWI_1;
-   -----------------
-   -- Initialized --
-   -----------------
+   procedure Servo (ServoPin : ServoPins ;
+                    Angle : Degrees);
 
-   function Initialized return Boolean
-   is (Init_Done);
+private
+   procedure Drive_Wheels(rf : Wheel;
+                         rb : Wheel;
+                         lf : Wheel;
+                         lb : Wheel);
 
-   function InitializedExt return Boolean
-   is (Init_DoneExt);
-   ----------------
-   -- Initialize --
-   ----------------
+   procedure Initialize;
 
-   procedure Initialize (S : Speed := S400kbps) is
-   begin
-      Device.Configure
-        (SCL   => MB_SCL.Pin,
-         SDA   => MB_SDA.Pin,
-         Speed => (case S is
-                      when S100kbps => nRF.TWI.TWI_100kbps,
-                      when S250kbps => nRF.TWI.TWI_250kbps,
-                      when S400kbps => nRF.TWI.TWI_400kbps)
-        );
-
-      Device.Enable;
-      Init_Done := True;
-   end Initialize;
-
-   procedure InitializeExt (S : Speed := S400kbps) is
-   begin
-      DeviceExt.Configure
-        (SCL   => MB_SCL_EXT.Pin,
-         SDA   => MB_SDA_EXT.Pin,
-         Speed => (case S is
-                      when S100kbps => nRF.TWI.TWI_100kbps,
-                      when S250kbps => nRF.TWI.TWI_250kbps,
-                      when S400kbps => nRF.TWI.TWI_400kbps)
-        );
-
-      DeviceExt.Enable;
-      Init_DoneExt := True;
-   end InitializeExt;
-   ----------------
-   -- Controller --
-   ----------------
-
-   function Controller return not null Any_I2C_Port
-   is (Device'Access);
-
-   function ControllerExt return not null Any_I2C_Port
-   is (DeviceExt'Access);
-end MicroBit.I2C;
+end MicroBit.MotorDriver;
