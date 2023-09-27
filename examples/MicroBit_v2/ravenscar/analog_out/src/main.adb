@@ -45,7 +45,7 @@ begin
    --  A 100% duty cycle means a DC signal (always up), eg the frequency is 0, despite being set.
    --  A 50% duty cycle means on average 1.65V but it also means 50% the pulse is up at 3.3V and 50% the pulse is down at 0V.
    --  A 10% duty cycle means 10% of 3.3V = on average 0.33V: 10% up, 90% down.
-   Write (0, Value);
+   analogWrite (0, Value);
    
    --  Wait 5 seconds
    delay(5.0);
@@ -60,9 +60,10 @@ begin
 	--                                     2.5 ms/20ms = 12.5% ( +90 degree) 
 	  
    -- Loop for value between 25 = 2.5% of 1023 (3.3V) and 127 = 12.5% of 1023.
-      for Angle in Analog_Value range 25.. 127 loop
+      for Angle in Analog_Value range 0..1023 loop
          --Set new duty cycle
-         Write (0, Angle);
+         analogWrite (0, Angle);
+         digitalWrite (16, False);
      
          --Wait 2 frames of 50Hz = 40ms (delay is always needed because a servo needs time to physically rotate. Delay depends on amount of rotation and rotation speed of servo) 
          --we also set the period to be 20ms, so faster than 20ms makes no sense.
