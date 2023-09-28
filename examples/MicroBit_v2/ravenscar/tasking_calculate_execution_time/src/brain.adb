@@ -1,6 +1,9 @@
 with Ada.Real_Time; use Ada.Real_Time;
-with Ada.Text_IO; use Ada.Text_IO; -- instead of MicroBit.Console we can also use Ada.Text_IO (in the Serial Ports view) for convenience which use the same API's
+--  with Ada.Text_IO; use Ada.Text_IO; -- instead of MicroBit.Console we can also use Ada.Text_IO (in the Serial Ports view) for convenience which use the same API's
+with MicroBit.Console; use MicroBit.Console;
 with Ada.Execution_Time; use Ada.Execution_Time;
+with MicroBit; use MicroBit;
+with MicroBit.MotorDriver;
 
 package body Brain is
 
@@ -19,7 +22,10 @@ package body Brain is
                Time_Now_Stopwatch := Clock;
                Time_Now_CPU := Clock;
 
-               delay 0.03; --simulate execution time = 30 ms.
+            MotorDriver.Drive(MotorDriver.Forward);
+            MotorDriver.Drive(MotorDriver.Left);
+            MotorDriver.Drive(MotorDriver.Right);
+               --  delay 0.03; --simulate execution time = 30 ms.
 
                Elapsed_CPU := Elapsed_CPU + (Clock - Time_Now_CPU);
                Elapsed_Stopwatch := Elapsed_Stopwatch + (Clock - Time_Now_Stopwatch);
@@ -30,7 +36,7 @@ package body Brain is
 
             Put_Line ("Average CPU time: " & To_Duration (Elapsed_CPU)'Image & " seconds");
             Put_Line ("Average Stopwatch time: " & To_Duration (Elapsed_Stopwatch)'Image & " seconds");
-
+            delay(0.03);
       end loop;
    end Sense;
 end Brain;
