@@ -1,5 +1,5 @@
 With MicroBit.IOsForTasking; use MicroBit.IOsForTasking;
-
+generic
 package Ultrasonic is
 
    type Distance_cm is range 0 .. 400; -- if < 2 it is invalid

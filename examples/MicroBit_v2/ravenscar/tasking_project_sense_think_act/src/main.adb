@@ -1,5 +1,6 @@
 --with MyController; -- This embeds and instantiates the MyController package
-with MyController_empty;
+with MyController_empty; use MyController_empty;
+with MicroBit.Console;
 
 -- NOTE ----------
 -- See the MyController_empty package first for a single file empty Sense-Think-Act (STA) template
@@ -16,6 +17,14 @@ begin
    loop -- We need a main loop, otherwise it constantly reboots!
         -- A reboot can be seen in the Serial Ports (View -> Serial Port, select com port, set baudrate to 115200 and press reset button on Microbit)
         -- Every time the Micro:Bit reboots it will begin with a "0" symbol in your Serial Port monitor.
-      null;
+
+      -- EXCERCISE: Make a benchmarking program
+      -- Fetch the values T and P
+      -- Calculate the C using stopwatch
+      -- Prove that the program guarantees the time
+
+      --null;
+      MicroBit.Console.Put_Line("within main");
+      -- Sense
    end loop;
 end Main;

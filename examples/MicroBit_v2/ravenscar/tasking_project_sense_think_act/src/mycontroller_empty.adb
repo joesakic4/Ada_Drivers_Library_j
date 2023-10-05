@@ -8,6 +8,7 @@ package body MyController_empty is
       loop
          myClock := Clock;
          
+         Put_Line("within task sense");
          delay (0.05); --simulate 50 ms execution time, replace with your code
          
          MotorDriver.SetDirection (Stop);
@@ -22,6 +23,7 @@ package body MyController_empty is
       loop
          myClock := Clock;
          
+         Put_Line("within task think");
          delay (0.05); --simulate 50 ms execution time, replace with your code
          
          MotorDriver.SetDirection (Forward);
