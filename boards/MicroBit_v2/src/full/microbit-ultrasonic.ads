@@ -1,4 +1,5 @@
 With MicroBit.IOsForTasking; use MicroBit.IOsForTasking;
+generic
 
 package MicroBit.Ultrasonic is
 
@@ -13,4 +14,4 @@ package MicroBit.Ultrasonic is
    function WaitForEcho return Integer;
    
    function ConvertEchoToDistance (echo_time_us : Integer) return Distance_cm;
-end Ultrasonic;
+end MicroBit.Ultrasonic;

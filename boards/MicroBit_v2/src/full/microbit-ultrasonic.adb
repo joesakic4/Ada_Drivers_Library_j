@@ -12,8 +12,8 @@ package body MicroBit.Ultrasonic is
    procedure Setup (trigger_pin : Pin_Id; echo_pin : Pin_Id) is
       dummy : Boolean; -- we dont use this variable for anything, but need it to setup the input (bad API)
    begin
-      Set(trigger_pin, False); --set to output
-      dummy := Set(echo_pin); --set to input
+      digitalWrite(trigger_pin, False); --set to output
+      dummy := digitalRead(echo_pin); --set to input
 
       trigger_pin_device := Points(trigger_pin).Pin;
       echo_pin_device := Points(echo_pin).Pin;
@@ -76,4 +76,4 @@ package body MicroBit.Ultrasonic is
 
       return Distance_cm(temp_result);
    end ConvertEchoToDistance;
-end Ultrasonic;
+end MicroBit.Ultrasonic;
