@@ -1,79 +1,105 @@
 with MicroBit.TimeHighspeed; use MicroBit.TimeHighspeed;
-with MicroBit.IOsForTasking; use MicroBit.IOsForTasking;
-with NRF_SVD.GPIO; use NRF_SVD.GPIO;
-use MicroBit;
-with HAL; use HAL;
 package body MicroBit.Ultrasonic is
+   Trigger : GPIO_Point;
+   Echo  : GPIO_Point;
 
-   trigger_pin_device : Integer;
-   echo_pin_device : Integer;
-   result : Distance_cm := 0;
-
-   procedure Setup (trigger_pin : Pin_Id; echo_pin : Pin_Id) is
-      dummy : Boolean; -- we dont use this variable for anything, but need it to setup the input (bad API)
+   --we use this setup function to prevent a dependency on Microbit.IOS
+   procedure Initialize
+   is
+      Conf : GPIO_Configuration;
    begin
-      digitalWrite(trigger_pin, False); --set to output
-      dummy := digitalRead(echo_pin); --set to input
+      Trigger := Trigger_Pin;
+      Echo := Echo_Pin;
 
-      trigger_pin_device := Points(trigger_pin).Pin;
-      echo_pin_device := Points(echo_pin).Pin;
-   end Setup;
+      Conf.Mode         := Mode_Out;
+      Conf.Resistors    := No_Pull;
+      Conf.Input_Buffer := Input_Buffer_Connect;
+      Conf.Sense        := Sense_Disabled;
+
+      --set trigger pin as output
+      Trigger.Configure_IO (Conf);
+      Trigger.Clear;
+
+      --set echo pin as input
+      Conf.Mode         := Mode_In;
+      Echo.Configure_IO (Conf);
+      Echo.Clear;
+   end Initialize;
 
    function Read return Distance_cm is
-      echo_time_us : Integer;
+      Result_in_cm : Distance_cm := 0;
    begin
-      SendTriggerPulse; --blocking!
-      echo_time_us := WaitForEcho; --blocking!
-      result := ConvertEchoToDistance(echo_time_us);
+      SendTriggerPulse; --blocking, but only 10 us
+      Result_in_cm := WaitForEcho; --blocking, max 3 + 23 = 26 ms;
 
-      --Delay needs to be at least 23ms for max range of 400cm. If only interested in shorter ranges, shorter delay can be set
-      return result;
+      return Result_in_cm;
    end Read;
 
    procedure SendTriggerPulse is
    begin
-      GPIO_Periph.OUT_k.Arr (trigger_pin_device) := high;
-      Delay_Us(10); -- Not 10 us, more about 11.4us (10 us+ required by ultrasonic spec)
-                       --Higher delays become more accurate
-                      -- If you use direct pin assignment setting a pin once before the loop (to be output, see init)
-                      -- and using GPIO_Periph.OUT_k.Arr (1) := high or low (use With NRF_SVD.GPIO; use NRF_SVD.GPIO;)
-                      -- 2 us pulses can be reached if Delay is set to 1. These are blocking calls and implemented using assembly NOP instructions so not precise
-                      -- A 64MHz clock (systick) signal would be more accurate to use and count 64 pulses for 1 us.
-                      -- There will always be a slight delay when toggling a pin. Toggling in hardware using use PPI and TE (eg. automatically reacting to rising/falling edge has the least delay.
-      GPIO_Periph.OUT_k.Arr (trigger_pin_device) := low;
+       -- Not 10 us, more about 11.4us (10 us+ required by ultrasonic spec)
+      Trigger.Set;
+      Delay_Us(10);
+      Trigger.Clear;
       end SendTriggerPulse;
 
-   function WaitForEcho return Integer is
-      delayCounter :Integer := 0;
+   function WaitForEcho return Distance_cm is
+      IsTimeout : Boolean := False;
+      Result_in_CM : Distance_cm := 0;
    begin
-      --wait for echo to start
-      while GPIO_Periph.IN_k.Arr(echo_pin_device) = low loop
-         null;
-      end loop;
+      --see polling example: https://learn.adacore.com/courses/intro-to-embedded-sys-prog/chapters/handling_interrupts.html#interrupt-handlers
+
+      --wait for echo to start (should take about 200us to send 8x40KHz burst and after that it is set to high automatically by sensor)
+      IsTimeout := Wait_For_Start_Blocking_Using_Polling_With_Timeout(Milliseconds(3)); --max 3 ms blocking wait
 
       --wait for echo to end
-      while GPIO_Periph.IN_k.Arr(echo_pin_device) = high loop
-         Delay_Us(58);  --wait for 58 us or 1 cm distance and check again
-         delayCounter := delayCounter + 1;
-      end loop;
+      if not IsTimeout then
+         Result_in_CM := Wait_For_End_Blocking_Using_Polling_With_Timeout(Milliseconds(23)); --max 23 ms
+      end if;
 
-      return delayCounter * 58; --high time in us
+      return Result_in_CM;
    end WaitForEcho;
 
-   function ConvertEchoToDistance (echo_time_us : Integer) return Distance_cm is
-    temp_result : Integer;
+   function Wait_For_End_Blocking_Using_Polling_With_Timeout(Timeout_Ms : Time_Span) return Distance_cm
+   is
+      Deadline : constant Time := Clock + Timeout_Ms;
+      Result_in_CM :Distance_cm := 0;
    begin
-      -- Distance formula see: https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
-      temp_result := echo_time_us/ 58;
+      --use a named loop so we can call "exit named loop when" instead of "while .. "
+   Polling: loop
+         exit Polling when Echo.Set = False;
+         -- Distance formula see: https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
+         Delay_Us(58);  --wait for 58 us or 1 cm distance and check again
+         Result_in_CM := Result_in_CM + 1;
 
-      if temp_result > 400 then
-         temp_result := 400;
+         if Clock >= Deadline then
+            Result_in_CM := 0;
+            Echo.Set; --0 cm, NOTE: this cutoff threshold means that value is unusable
+         end if;
+
+   end loop Polling;
+
+      return Result_in_CM;
+end Wait_For_End_Blocking_Using_Polling_With_Timeout;
+
+ function Wait_For_Start_Blocking_Using_Polling_With_Timeout  (Timeout_Ms : Time_Span) return Boolean
+is
+      Deadline : constant Time := Clock + Timeout_Ms;
+      IsTimeOut: Boolean := False;
+   begin
+      --use a named loop so we can call "exit named loop when" instead of "while .. "
+   Polling: loop
+      exit Polling when Echo.Set = True;
+      if Clock >= Deadline then
+            Echo.Clear;
+            IsTimeOut := True;
       end if;
+   end loop Polling;
 
-      if temp_result < 2 then
-         temp_result := 0;
-      end if;
+      return IsTimeOut;
+   end Wait_For_Start_Blocking_Using_Polling_With_Timeout;
 
-      return Distance_cm(temp_result);
-   end ConvertEchoToDistance;
+
+begin
+   Initialize;
 end MicroBit.Ultrasonic;
