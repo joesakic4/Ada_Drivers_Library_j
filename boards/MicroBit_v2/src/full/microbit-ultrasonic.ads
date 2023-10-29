@@ -1,17 +1,25 @@
-With MicroBit.IOsForTasking; use MicroBit.IOsForTasking;
+with nRF.GPIO; use nRF.GPIO;
+with Microbit.Types; use MicroBit.Types;
+with Ada.Real_Time; use Ada.Real_Time;
+
 generic
-
-package MicroBit.Ultrasonic is
-
-   type Distance_cm is range 0 .. 400; -- if < 2 it is invalid
+   Trigger_Pin : GPIO_Point;
+   Echo_Pin : GPIO_Point;
    
+package MicroBit.Ultrasonic is
+ 
    function Read return Distance_cm;
    
+   
+private
+   procedure Initialize;
+  
    procedure SendTriggerPulse;
    
-   procedure Setup (trigger_pin : Pin_Id; echo_pin : Pin_Id);
+   function WaitForEcho return Distance_cm;
    
-   function WaitForEcho return Integer;
+   function Wait_For_End_Blocking_Using_Polling_With_Timeout(Timeout_Ms : Time_Span) return Distance_cm;
    
-   function ConvertEchoToDistance (echo_time_us : Integer) return Distance_cm;
+   function Wait_For_Start_Blocking_Using_Polling_With_Timeout  (Timeout_Ms : Time_Span) return Boolean;
+   
 end MicroBit.Ultrasonic;

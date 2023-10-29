@@ -29,61 +29,44 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with MicroBit.Ultrasonic;
-with MicroBit.Types;
 with MicroBit.MotorDriver; use MicroBit.MotorDriver; --using the procedures defined here
 with DFR0548;  -- using the types defined here
 
 with MicroBit.Console; use MicroBit.Console; -- for serial port communication
-with MicroBit.Time; use MicroBit.Time; -- for time facilities
 use MicroBit; --for pin names
-with MicroBit.I2C;
 
 procedure Main is
-   --  package sensor is new Ultrasonic;
-   --  distance : Types.Distance_cm := 0;
+
 begin
    MotorDriver.Servo(1,90);
-   Time.Sleep (1000);
+   delay 1.0; -- equivalent of Time.Sleep(1000) = 1 second
 
    loop
-      --  distance := sensor.Read;
-      --
-      --  case distance is
-      --     when 0..9      =>
-      --        MotorDriver.Drive(Rotating_Left);
-      --        Time.Sleep(800);
-      --     when 10..20     => MotorDriver.Drive(Forward,(2048,2048,2048,2048));
-      --     when others    => MotorDriver.Drive(Forward,(4095,4095,4095,4095));
-      --  end case;
-      --
-      --  Time.Sleep(50);
-
-       --  DEMONSTRATION ROUTINE 4 MOTORS (useful for checking your wiring)
+      -- DEMONSTRATION ROUTINE 4 MOTORS (useful for checking your wiring)
       MotorDriver.Drive(Forward,(4095,0,0,0)); --right front wheel to M4
-      Time.Sleep (1000);
+      delay 1.0;
       MotorDriver.Drive(Forward,(0,4095,0,0)); --right back wheel to M3
-      Time.Sleep (1000);
+      delay 1.0;
       MotorDriver.Drive(Forward,(0,0,4095,0)); --left front wheel to M2
-      Time.Sleep (1000);
-       MotorDriver.Drive(Forward,(0,0,0,4095)); --left back wheel to M1
-      Time.Sleep (1000); -- wait a bit longer, before doing the loop again
+      delay 1.0;
+      MotorDriver.Drive(Forward,(0,0,0,4095)); --left back wheel to M1
+      delay 1.0;
       MotorDriver.Drive(Stop);
 
       -- DEMONSTRATION ROUTINE SERVO
       for I in reverse DFR0548.Degrees range 0..90 loop
          MotorDriver.Servo(1,I);
-         Time.Sleep (20);
+          delay 0.02; --20 ms
       end loop;
 
       for I in DFR0548.Degrees range 90..180 loop
          MotorDriver.Servo(1,I);
-         Time.Sleep (20);
+         delay 0.02; --20 ms
       end loop;
 
       for I in reverse DFR0548.Degrees range 90..180 loop
          MotorDriver.Servo(1,I);
-         Time.Sleep (20);
+          delay 0.02; --20 ms
       end loop;
 
    end loop;

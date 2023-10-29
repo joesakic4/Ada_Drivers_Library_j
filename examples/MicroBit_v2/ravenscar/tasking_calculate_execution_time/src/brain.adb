@@ -1,6 +1,6 @@
 with Ada.Real_Time; use Ada.Real_Time;
---  with Ada.Text_IO; use Ada.Text_IO; -- instead of MicroBit.Console we can also use Ada.Text_IO (in the Serial Ports view) for convenience which use the same API's
-with MicroBit.Console; use MicroBit.Console;
+with MicroBit.Console; use MicroBit.Console ;
+use MicroBit;
 with Ada.Execution_Time; use Ada.Execution_Time;
 with MicroBit; use MicroBit;
 with MicroBit.MotorDriver;
