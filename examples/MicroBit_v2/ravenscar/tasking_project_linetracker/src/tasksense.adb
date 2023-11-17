@@ -10,8 +10,8 @@ package body TaskSense is
          MyClock := Clock;
 
          --read sensor values
-         LineTrackerLeft  := LineTrackerRead (4);
-         LineTrackerRight := LineTrackerRead (10);
+         LineTrackerLeft  := LineTrackerRead (16);
+         LineTrackerRight := LineTrackerRead (15);
 
          --make decision
          if LineTrackerLeft = True and LineTrackerRight = True then

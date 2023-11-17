@@ -28,7 +28,7 @@ package body interrupt_demo is
       end loop;
    end Process_Messages;
    
-    protected body Receiver is
+   protected body Receiver is   
       --  procedures can modify the data
       procedure SetStatus (S : Pin) is
       begin
@@ -89,8 +89,8 @@ package body interrupt_demo is
    
   
      
-   Conf_falling : GPIO_Configuration;
-   Conf_rising : GPIO_Configuration;
+   Conf_falling   : GPIO_Configuration;
+   Conf_rising    : GPIO_Configuration;
   
 begin
       Put_Line ("START INIT");

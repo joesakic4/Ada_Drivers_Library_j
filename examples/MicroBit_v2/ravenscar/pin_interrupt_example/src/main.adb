@@ -1,5 +1,6 @@
 with interrupt_demo;
 with MicroBit.IOsForTasking; use MicroBit.IOsForTasking;
+with MicroBit; use MicroBit;
 with Ada.Real_Time; use Ada.Real_Time;
 with MicroBit.Console; use MicroBit.Console;
 procedure Main with Priority => 0 is
@@ -16,14 +17,13 @@ procedure Main with Priority => 0 is
    -- this example is partly based on https://www.adacore.com/gems/ada-gem-13
    -- and https://devzone.nordicsemi.com/f/nordic-q-a/47973/how-to-implement-interrupt-using-gpio-not-gpiote-peripheral
 
-
 begin
    delay until Clock + Milliseconds (100); -- delayed start
    Put_Line ("START MAIN");
    loop --generate some square wave pattern
-      Set(7,True);
+      digitalWrite(7,False);
       delay until Clock + Milliseconds (2000);
-      Set(7, False);
+      digitalWrite(7, True);
       delay until Clock + Milliseconds (1000);
    end loop;
 end Main;
